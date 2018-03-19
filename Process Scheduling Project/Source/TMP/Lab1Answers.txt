@@ -1,0 +1,80 @@
+Unity: psingh22
+
+1.	What are the advantages and disadvantages of each of the two scheduling policies? 
+	Also, give the advantages and disadvantages of the round robin scheduling policy 
+	originally implemented in Xinu.
+Ans.
+
+RANDOMSCHED
+	Advantages:
+		* Based on the priority, processes will get proportional CPU time: Hence higher 
+		priority process will get more CPU time.
+		* Solves starvation issue (found in the default Xinu scheduler): Here the lower priority 
+		processes may get CPU time, even if there are higher priority process in the ready queue.
+		So it brings a small degree of fairness in the scheduling.
+		* It is faster than LINUXSCHED(as the logic is simpler).
+	
+	Disadvantages:
+		* It is slower than the default Xinu Scheduler as it needs to perform some extra computational 
+		steps.
+		* It is not suited for systems where we want a definite order of process scheduling as this in-
+		volves random selection of the processes.
+
+LINUXSCHED
+	Advantages:
+		* Fairness: This scheduler achieves fairness and also gives more time to higher priority process
+		and at the same time does not starve the lower priority processes. 
+		* CPU time is proportional to the goodness value of the process. So, if a process allows other to 
+		execute in the last epoch, it will have higher goodness and hence more chance of getting scheduled.
+		* It provides a definite order of process scheduling and has no unpredictability.
+
+	Disadvantages:
+		* Slower than the default Xinu Scheduler and RANDOMSCHED.
+		* Very complex to implement and has higher computational overhead.
+		* It needs to store goodness, counter, and quantum for all the process. So it needs extra mem-
+		mory.
+
+Round robin scheduling policy originally implemented in Xinu(default Xinu Scheduler):
+	Advantages:
+		* It is faster than RANDOMSCHED and LINUXSCHED.
+		* Highest priority process gets to execute. So it is easy to implement. 
+
+	Disadvantages:
+		* Starvation of lower priority processes
+		* Not at all good for systems where we need to run real-time/interactive applications, as those
+		will get blocked if a higher process is present in the system.
+
+2.	Assume that there are three processes P1, P2, P3 that will run forever without blocking. 
+	We want to allocate the following CPU times to each of them: 20% to P1, 30% to P2, and 
+	50% to P3. Which priorities do we need to set to P1, P2, and P3 to accomplish this if we 
+	want to use the Random scheduler?  Assume that those processes are the only ones running 
+	in the machine. Could you give a generalization of your result to n processes? Explain.
+Ans. P1 = 20, P2 = 30, P3 = 50
+
+Generalization: 
+	Let's say we want 
+				p1% cpu time for P1,
+				p2% cpu time for P1, 
+				...................,
+				...................,
+				pn% cpu time for Pn.
+	
+	so, the priorities of the processes P1 should be p1, P2 should be p2 ... so on. 
+			
+				
+
+3.	Describe the way each of the schedulers affects the NULL process.
+Ans. The NULL process has priority 0. All other process will have higher priorities than 0.
+ 
+	Xinu Scheduler: It will not schedule the NULL process, until there is any other process 
+	present in the ready queue. The ready queue is ordered by the priorities of the processes, so the
+	NULL process will not get to the tail of the queue, if there are other processes in the queue.
+
+	RANDOMSCHED: It will not schedule the NULL process, if there is any other process 
+	present in the ready queue. As, the NULL process has priority 0, it will not get 0% CPU time if 
+	there is at least one runnable process.
+	
+	LINUXSCHED: NULL process will not get scheduled as it has goodness value of 0. Only if no process 
+	is runnable, then NULL process is scheduled by a hack.
+	
+	
