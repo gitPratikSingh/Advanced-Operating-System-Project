@@ -1,0 +1,63 @@
+
+1.	The priority inversion problem could cause that a higher-priority process 
+needs to wait for the completion of a lower-priority process.
+
+	1. Priority inheritance is one approach to address this issue. Please give 
+	another approach and briefly describe its idea.
+	
+	Ans. 
+	
+		We can use Random Boosting technique to address the issue of priority
+	inversion. In Random Boosting technique, the priority of any runnable thread
+	that holds at least one lock, is increased by a random value until it releases
+	the lock(s). So, eventually all the threads holding a lock will finish its
+	critical section and release the lock. And thus the blocked higher priority
+	processes(if any), will be able to acquire the lock.
+	
+	2. Design a test case to show that your approach can address the priority 
+	inversion problem. You should compare the results that derived from the 
+	original XINU implementation (use semaphore) and that derived from your 
+	implementation (use readers/writer locks). Put your results in Lab2Answers.txt 
+	and your test case program (name it task1.c) in both ./sys and ./TMP
+	
+	Ans. 
+		
+		Scenario:
+		3 processes, h, l and m, with priorities high, low and medium respectively.
+		
+		Step1. Process l is created and it acquires a write lock/sem on a resource r1.
+		Step2. Process m is created and it preempts the process l and acquire a read 
+			   lock/sem on resource r2.
+		Step3. Process h is created and it preempts the process m, and it tries to 
+			   acquire a lock/sem on resource r1. But as the resource is already taken
+			   up by l, it goes to sleep.
+		Step4. Now, if priority inversion is handled properly, then process l will execute
+			   and before m. Hence l is finish, followed by h and then by m.
+			   Otherwise, m will finish first,followed by l and h respectively.
+			   
+		In my solution(task1.c), when I use locks for synchronization, the order
+		of process completion is l,h,m. This indicates that priority inheritance
+		is working, whereas when I use semaphore for synchronization, the order
+		of process completion is m,l,h. This indicates that priority inversion
+		is not handled by default semaphore implementation in Xinu.
+		
+2. Synchronization is a quite complex issue in operating systems. To show your understanding 
+about process synchronization, you are asked to point out a reader/writer synchronization 
+issue in this pesudo-code: task2_sync_issue.c. Multiple reader threads can execute this code 
+concurrently by calling do_update. All the variables starting with global_ are global 
+variables. You are asked to describe the potential issue caused by the incorrect 
+synchronization and point out at least one possible thread interleaving that would trigger 
+the problem. Put your answer in Lab2Answers.txt mentioned above.
+
+Ans.
+	
+	The global_semaphore synchronizes the code block where the function buffer_add is called.
+	This semaphore is initialized at 10, which means multiple readers can access it at the 
+	same time. The function buffer_add writes to the global buffer. So multiple readers may
+	overwrite each other's work in the global buffer.
+	
+	For example, if a low-priority reader writes to the global buffer but it has not updated 
+	the buffer size. Now a higher-priority reader may preempt the other reader before it 
+	updates the size, and it will result in higher-priority process overwriting the work of 
+	lower-priority process.
+	
