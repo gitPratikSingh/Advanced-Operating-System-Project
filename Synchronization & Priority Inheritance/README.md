@@ -1,7 +1,6 @@
 Interfaces to Implement
 Basic Locks
 
-
 For this lab you must implement the entire readers/writer lock system. This includes code or functions to:
 
 initialize locks (call a function linit() from the sysinit() function in initialize.c)
